@@ -18,9 +18,9 @@ npm install
 ```.env
 // file: .env
 
-COCKPIT_DOMAIN=http://debugmate-app.test
-COCKPIT_TOKEN=29b68285-5c46-42d0-86a8-19b0c6cd4324
-COCKPIT_ENABLED=true
+DEBUGMATE_DOMAIN=http://debugmate-app.test
+DEBUGMATE_TOKEN=29b68285-5c46-42d0-86a8-19b0c6cd4324
+DEBUGMATE_ENABLED=true
 ```
 
 
@@ -81,3 +81,22 @@ const DebugmateGlobalErrorHandler = ({ children }) => {
 
 export default DebugmateGlobalErrorHandler;
 ```
+### 2.1. Wrap Your Application with the DebugmateGlobalErrorHandler
+
+To ensure that global error handling is applied throughout your application, wrap your main application component with `DebugmateGlobalErrorHandler`. Here's an example:
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import DebugmateGlobalErrorHandler from 'debugmate';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
+  <React.StrictMode>
+    <DebugmateGlobalErrorHandler>
+      <App />
+    </DebugmateGlobalErrorHandler>
+  </React.StrictMode>
+);
