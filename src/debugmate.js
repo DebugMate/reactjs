@@ -1,35 +1,34 @@
 import { parse } from './stackTraceParser';
-import { Context } from './context';
 import setupGlobalErrorHandlers from './errorHandler';
+import {Context} from './context';
 
 class Debugmate {
     constructor() {
-        this.domain = process.env.REACT_APP_DEBUGMATE_DOMAIN;
-        this.token = process.env.REACT_APP_DEBUGMATE_TOKEN;
-        this.enabled = process.env.REACT_APP_DEBUGMATE_ENABLED;
+        this.domain = process.env.REACT_APP_DEBUGMATE_DOMAIN || process.env.NEXT_PUBLIC_DEBUGMATE_DOMAIN;
+        this.token = process.env.REACT_APP_DEBUGMATE_TOKEN || process.env.NEXT_PUBLIC_DEBUGMATE_TOKEN;
+        this.enabled = process.env.REACT_APP_DEBUGMATE_ENABLED || process.env.NEXT_PUBLIC_DEBUGMATE_ENABLED;
+
+        // Criando uma instância de Context
+        this.context = new Context();
     }
 
-    publish(error, request) {
-        console.log('This dentro de publish:', this);
-        if (!error || !this.enabled || !this.domain || !this.token) {
-            console.log('Error not published to Debugmate. Check environment variables or the error.');
-            return;
-        }
+    setUser(user) {
+        this.context.setUser(user);
+    }
 
-        const context = new Context();
-        const appContext = this.checkAppContext();
+    setEnvironment(environment) {
+        this.context.setEnvironment(environment);
+    }
 
-        if (appContext?.getUser) {
-            context.setUser(appContext.getUser());
-        }
+    setRequest(request) {
+        this.context.setRequest(request);
+    }
 
-        if (appContext?.getEnvironment) {
-            context.setEnvironment(appContext.getEnvironment());
-        }
+    publish(error) {
+        if (!this.isPublishingAllowed(error)) return;
 
-        if (request) {
-            context.setRequest(request);
-        }
+        const requestPayload = this.context.appRequest(); // Obtendo dados da requisição do Context
+        const data = this.payload(error, requestPayload);
 
         fetch(`${this.domain}/api/capture`, {
             method: 'POST',
@@ -38,29 +37,35 @@ class Debugmate {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
-            body: JSON.stringify(this.payload(error, context)),
+            body: JSON.stringify(data),
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Request error: ${response.status}`);
-                }
+            .then(this.handleResponse)
+            .catch(err => console.error('Error:', err));
+    }
 
-                return response.text();
-            })
-            .then(text => {
-                try {
-                    const data = JSON.parse(text);
+    isPublishingAllowed(error) {
+        if (!error || !this.enabled || !this.domain || !this.token) {
+            console.log('Error not published to Debugmate. Check environment variables or the error.');
+            return false;
+        }
+        return true;
+    }
 
-                    if (!data.success) {
-                        console.error('Failed to report error:', data);
-                    }
-                } catch (e) {
-                    console.error('Error parsing response:', e);
+    handleResponse(response) {
+        if (!response.ok) {
+            throw new Error(`Request error: ${response.status}`);
+        }
+
+        return response.text().then(text => {
+            try {
+                const data = JSON.parse(text);
+                if (!data.success) {
+                    console.error('Failed to report error:', data);
                 }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-            });
+            } catch (e) {
+                console.error('Error parsing response:', e);
+            }
+        });
     }
 
     setupGlobalErrorHandling() {
@@ -73,31 +78,23 @@ class Debugmate {
         }
     }
 
-    payload(error, context) {
+    payload(error, request) {
         const trace = this.trace(error);
-
-        console.log('Trace:', trace);
 
         let data = {
             exception: error.name,
             message: error.message,
-            file: trace[0].file,
+            file: trace[0]?.file || 'unknown',
             type: 'web',
-            trace: trace
+            trace: trace,
+            ...this.context.payload(), // Adicionando payload do Context
         };
-
-        if (context) {
-            context.setError(error);
-            data = { ...data, ...context.payload() };
-        }
 
         return data;
     }
 
     trace(error) {
-
-        let stackTrace = parse(error);
-
+        const stackTrace = parse(error);
         if (!stackTrace.sources || stackTrace.sources.length === 0) {
             return [];
         }
@@ -110,10 +107,6 @@ class Debugmate {
             class: source.file,
             preview: stackTrace.stack.split('\n'),
         }));
-    }
-
-    checkAppContext() {
-        return null;
     }
 }
 
