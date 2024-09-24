@@ -8,7 +8,6 @@ class Debugmate {
         this.token = process.env.REACT_APP_DEBUGMATE_TOKEN || process.env.NEXT_PUBLIC_DEBUGMATE_TOKEN;
         this.enabled = process.env.REACT_APP_DEBUGMATE_ENABLED || process.env.NEXT_PUBLIC_DEBUGMATE_ENABLED;
 
-        // Criando uma instância de Context
         this.context = new Context();
     }
 
@@ -27,7 +26,7 @@ class Debugmate {
     publish(error) {
         if (!this.isPublishingAllowed(error)) return;
 
-        const requestPayload = this.context.appRequest(); // Obtendo dados da requisição do Context
+        const requestPayload = this.context.appRequest(); 
         const data = this.payload(error, requestPayload);
 
         fetch(`${this.domain}/api/capture`, {
@@ -87,7 +86,7 @@ class Debugmate {
             file: trace[0]?.file || 'unknown',
             type: 'web',
             trace: trace,
-            ...this.context.payload(), // Adicionando payload do Context
+            ...this.context.payload(),
         };
 
         return data;

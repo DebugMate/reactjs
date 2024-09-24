@@ -5,8 +5,8 @@ export class Context {
         this.user = null;
         this.environment = null;
         this.process = {
-            platform: navigator.platform,
-            version: navigator.appVersion,
+            platform: typeof window !== 'undefined' && navigator.platform ? navigator.platform : 'unknown',
+            version: typeof window !== 'undefined' && navigator.appVersion ? navigator.appVersion : 'unknown',
         };
     }
 
@@ -90,8 +90,8 @@ export class Context {
     }
 
     appEnvironment() {
-        const nodeContext = {
-            group: 'Node',
+        const javascriptContext = {
+            group: 'JavaScript',
             variables: {
                 version: this.getProcess.version || 'unknown',
             }
@@ -122,7 +122,7 @@ export class Context {
         };
 
         return {
-            environment: this.filterKeys([nodeContext, environmentContext, systemContext])
+            environment: this.filterKeys([javascriptContext, environmentContext, systemContext])
         };
     }
 

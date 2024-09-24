@@ -13,8 +13,9 @@ const setupGlobalErrorHandlers = (debugmate) => {
     };
 
     const handleUnhandledRejection = (event) => {
-        console.error('Unhandled Promise Rejection:', event.reason);
-        debugmate.publish(event.reason);
+        console.error('Unhandled Promise Rejection:', event);
+        const reason = event.reason instanceof Error ? event.reason : new Error(event.reason);
+        debugmate.publish(reason);
     };
 
     window.onerror = handleGlobalError;
