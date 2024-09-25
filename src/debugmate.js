@@ -23,8 +23,16 @@ class Debugmate {
         this.context.setRequest(request);
     }
 
-    publish(error) {
+    publish(error, userContext = null, environmentContext = null) {
         if (!this.isPublishingAllowed(error)) return;
+
+        if(userContext){
+            this.setUser(userContext);
+        }
+
+        if(environmentContext){
+            this.setEnvironment(environmentContext);
+        }
 
         const requestPayload = this.context.appRequest(); 
         const data = this.payload(error, requestPayload);
