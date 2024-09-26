@@ -1,6 +1,6 @@
-import { parse } from './stackTraceParser';
-import setupGlobalErrorHandlers from './errorHandler';
-import {Context} from './context';
+const { parse } = require('./stackTraceParser');
+const setupGlobalErrorHandlers = require('./errorHandler');
+const { Context } = require('./context');
 
 class Debugmate {
     constructor() {
@@ -26,15 +26,15 @@ class Debugmate {
     publish(error, userContext = null, environmentContext = null) {
         if (!this.isPublishingAllowed(error)) return;
 
-        if(userContext){
+        if (userContext) {
             this.setUser(userContext);
         }
 
-        if(environmentContext){
+        if (environmentContext) {
             this.setEnvironment(environmentContext);
         }
 
-        const requestPayload = this.context.appRequest(); 
+        const requestPayload = this.context.appRequest();
         const data = this.payload(error, requestPayload);
 
         fetch(`${this.domain}/api/capture`, {
@@ -52,6 +52,7 @@ class Debugmate {
 
     isPublishingAllowed(error) {
         if (!error || !this.enabled || !this.domain || !this.token) {
+            console.log("this", this)
             console.log('Error not published to Debugmate. Check environment variables or the error.');
             return false;
         }
@@ -117,4 +118,4 @@ class Debugmate {
     }
 }
 
-export default Debugmate;
+module.exports = Debugmate;

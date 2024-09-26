@@ -1,4 +1,4 @@
-export function parse(error) {
+function parse(error) {
     if (!error.stack) {
         return { sources: [], stack: '' };
     }
@@ -30,3 +30,5 @@ export function parse(error) {
 
     return { sources, stack };
 }
+
+module.exports = { parse };

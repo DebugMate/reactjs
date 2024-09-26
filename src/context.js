@@ -1,4 +1,4 @@
-export class Context {
+class Context {
     constructor() {
         this.error = null;
         this.request = null;
@@ -65,8 +65,12 @@ export class Context {
     }
 
     appRequest() {
-        const url = window.location.href;
-        const queryParams = this.getQueryParams();
+        const url = window.location.href || 'unknown';
+        let queryParams = {};
+
+        if (url !== 'unknown') {
+            queryParams = this.getQueryParams();
+        }
 
         return {
             request: {
@@ -130,3 +134,5 @@ export class Context {
         return array.filter(value => Object.keys(value).length !== 0);
     }
 }
+
+module.exports = { Context };
