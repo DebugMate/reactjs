@@ -47,13 +47,12 @@ class Debugmate {
             body: JSON.stringify(data),
         })
             .then(this.handleResponse)
-            .catch(err => console.error('Error:', err));
+            .catch(err => console.error('Debugmate error:', err));
     }
 
     isPublishingAllowed(error) {
-        if (!error || !this.enabled || !this.domain || !this.token) {
-            console.log("this", this)
-            console.log('Error not published to Debugmate. Check environment variables or the error.');
+        if (!error || this.enabled == 'false' || !this.domain || !this.token) {
+            console.warn('Error not published to Debugmate. Check environment variables or the error.');
             return false;
         }
         return true;
@@ -65,6 +64,11 @@ class Debugmate {
         }
 
         return response.text().then(text => {
+            if (!text) { 
+                console.log('Debugmate: Empty response received, assuming success.');
+                return;
+            }
+
             try {
                 const data = JSON.parse(text);
                 if (!data.success) {
