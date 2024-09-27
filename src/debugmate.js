@@ -2,6 +2,32 @@ const { parse } = require('./stackTraceParser');
 const setupGlobalErrorHandlers = require('./errorHandler');
 const { Context } = require('./context');
 
+/**
+* @typedef {Object} User
+* @property {number} id
+* @property {string} name
+* @property {string} email
+*/
+
+/**
+* @typedef {Object} Environment
+* @property {string} environment
+* @property {boolean} debug
+* @property {string} timezone
+* @property {string} server
+* @property {string} database
+* @property {string} npm
+*/
+
+/**
+* @typedef {Object} Request
+* @property {Object} request
+* @property {Object} headers
+* @property {Object} query_string
+* @property {string} body
+*/
+
+
 class Debugmate {
     constructor() {
         this.domain = process.env.REACT_APP_DEBUGMATE_DOMAIN || process.env.NEXT_PUBLIC_DEBUGMATE_DOMAIN;
@@ -11,18 +37,40 @@ class Debugmate {
         this.context = new Context();
     }
 
+    /**
+     * Set the current user information (id, name, email).
+     * @param {User} user
+     * @returns {void}
+     */
     setUser(user) {
         this.context.setUser(user);
     }
 
+    /**
+     * Set the current environment information (environment, debug, timezone, server, database, npm).
+     * @param {Environment} environment
+     * @returns {void}
+     */
     setEnvironment(environment) {
         this.context.setEnvironment(environment);
     }
 
+    /**
+     * Set the current request information (request, headers, query_string, body).
+     * @param {Request} request
+     * @returns {void}
+     */
     setRequest(request) {
         this.context.setRequest(request);
     }
 
+    /**
+     * Publish an error to the external Debugmate API.
+     * @param {Error} error
+     * @param {User|null} userContext
+     * @param {Environment|null} environmentContext
+     * @returns {void}
+     */
     publish(error, userContext = null, environmentContext = null) {
         if (!this.isPublishingAllowed(error)) return;
 
@@ -50,6 +98,12 @@ class Debugmate {
             .catch(err => console.error('Debugmate error:', err));
     }
 
+    /**
+     * Check if the error publishing is allowed based on the presence of error object, domain, and token.
+     * Logs a warning and returns false if publishing is not allowed.
+     * @param {Error} error
+     * @returns {boolean}
+     */
     isPublishingAllowed(error) {
         if (!error || this.enabled == 'false' || !this.domain || !this.token) {
             console.warn('Error not published to Debugmate. Check environment variables or the error.');
@@ -58,38 +112,59 @@ class Debugmate {
         return true;
     }
 
-    handleResponse(response) {
+    /**
+     * Handle the API response after attempting to publish an error.
+     * Logs any response errors or failed error reports.
+     * @param {Response} response
+     * @returns {Promise<void>}
+     */
+    async handleResponse(response) {
         if (!response.ok) {
             throw new Error(`Request error: ${response.status}`);
         }
 
-        return response.text().then(text => {
-            if (!text) { 
-                console.log('Debugmate: Empty response received, assuming success.');
-                return;
+        const text = await response.text();
+        if (!text) {
+            console.log('Debugmate: Empty response received, assuming success.');
+            return;
+        }
+        try {
+            const data = JSON.parse(text);
+            if (!data.success) {
+                console.error('Failed to report error:', data);
             }
-
-            try {
-                const data = JSON.parse(text);
-                if (!data.success) {
-                    console.error('Failed to report error:', data);
-                }
-            } catch (e) {
-                console.error('Error parsing response:', e);
-            }
-        });
+        } catch (e) {
+            console.error('Error parsing response:', e);
+        }
     }
 
+    /**
+     * Set up global error handling to capture uncaught exceptions and promise rejections.
+     * This function integrates with the global error handling mechanism of the environment.
+     * @returns {void}
+     */
     setupGlobalErrorHandling() {
         setupGlobalErrorHandlers(this);
     }
 
+    /**
+    * Clean up global error handling by removing the error handlers previously set up.
+    * This function should be called when the error handling setup is no longer needed.
+    * @returns {void}
+    */
     cleanupGlobalErrorHandling() {
         if (this.errorHandlers) {
             this.errorHandlers.cleanupErrorHandlers();
         }
     }
 
+    /**
+     * Construct a payload object containing error details and context information for the API.
+     * This payload is formatted according to the requirements of the Debugmate API.
+     * @param {Error} error
+     * @param {Request} request
+     * @returns {Object}
+     */
     payload(error, request) {
         const trace = this.trace(error);
 
@@ -105,6 +180,13 @@ class Debugmate {
         return data;
     }
 
+    /**
+     * Parse the error stack trace to extract relevant information.
+     * This function uses the `stackTraceParser` module to extract the file, line, column, and function details
+     * from the error stack.
+     * @param {Error} error
+     * @returns {Array<Object>}
+     */
     trace(error) {
         const stackTrace = parse(error);
         if (!stackTrace.sources || stackTrace.sources.length === 0) {

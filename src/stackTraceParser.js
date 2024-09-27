@@ -1,3 +1,8 @@
+/**
+ * Parses an Error object to extract function names, file paths, and line/column numbers from the stack trace.
+ * @param {Error} error - The Error object to be parsed.
+ * @returns {Object} - An object containing an array of parsed sources and the formatted stack trace as a string.
+ */
 function parse(error) {
     if (!error.stack) {
         return { sources: [], stack: '' };
