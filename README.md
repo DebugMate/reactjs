@@ -14,15 +14,6 @@ file: package.json
 npm install
 ```
 
-### 3. Create `.env` file in the root project if you don't have one and add the following variables
-```.env
-// file: .env
-
-DEBUGMATE_DOMAIN=http://debugmate-app.test
-DEBUGMATE_TOKEN=29b68285-5c46-42d0-86a8-19b0c6cd4324
-DEBUGMATE_ENABLED=true
-```
-
 
 ## Usage
 
@@ -30,6 +21,9 @@ DEBUGMATE_ENABLED=true
 For dynamic error reporting, create a new provider called `DebugmateProvider` (or choose your preferred name). This provider will set user and environment information and manage global error handling.
 
 ```js
+import Debugmate from "devsquad-debugmate";
+import { createContext, useContext, useEffect, useMemo } from "react";
+
 const DebugmateContext = createContext(null);
 
 export const useDebugmate = () => {
@@ -37,7 +31,11 @@ export const useDebugmate = () => {
 };
 
 const DebugmateProvider = ({ children }) => {
-    const debugmate = useMemo(() => new Debugmate(), []);
+    const debugmate = useMemo(() => new Debugmate({
+      domain: "your-domain",
+      token: "your-key",
+      enabled: true,
+    }), []);
 
     const user = {
       id: 1,
