@@ -116,7 +116,7 @@ class Debugmate {
      * @returns {boolean}
      */
     isPublishingAllowed(error) {
-        if (!error || this.enabled == 'false' || !this.domain || !this.token) {
+        if (!error || this.enabled == false || !this.domain || !this.token) {
             console.warn('Error not published to Debugmate. Check environment variables or the error.');
             return false;
         }
