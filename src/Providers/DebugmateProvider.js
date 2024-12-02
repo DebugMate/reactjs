@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useDebugmateState } from '../contexts/Debugmate';
 
 export const DebugmateContext = createContext({});
