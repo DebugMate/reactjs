@@ -135,6 +135,28 @@ debugmate.setEnvironment({
 });
 ```
 
+### Set Request Context
+Request details such as HTTP method, headers, query strings, and body can be set using the setRequest method. This helps in tracking requests tied to specific errors.
+```js
+import { useDebugmateContext } from "debugmate";
+
+const debugmate = useDebugmateContext();
+
+debugmate.setRequest({
+  request: {
+    url: "https://api.example.com/resource",
+    method: "POST",
+    params: { key: "value" },
+  },
+  headers: {
+    Authorization: "Bearer token",
+    "Content-Type": "application/json",
+  },
+  query_string: { search: "query" },
+  body: JSON.stringify({ data: "payload" }),
+});
+```
+
 ### Publish Errors
 You can publish errors manually using the publish method. Pass optional user and environment contexts for better insights:
 
