@@ -158,7 +158,7 @@ debugmate.setRequest({
 ```
 
 ### Publish Errors
-You can publish errors manually using the publish method. Pass optional user and environment contexts for better insights:
+You can publish errors manually using the publish method. Pass optional `user`, `environment` and `request` contexts for better insights:
 
 ```js
 import { useDebugmateContext } from 'debugmate';
@@ -168,6 +168,6 @@ const debugmate = useDebugmateContext();
 try {
   throw new Error("Test error");
 } catch (error) {
-  debugmate.publish(error);
+  debugmate.publish(error, user, environment, request);
 }
 ```
