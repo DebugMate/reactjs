@@ -1,6 +1,6 @@
 {
   "name": "@debugmate/reactjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "DebugMate: An error tracking library for React & Next applications",
   "main": "index.js",
   "scripts": {
