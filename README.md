@@ -1,20 +1,11 @@
 ## Installation
 
-### 1. Add module as a local dependency(_while we're still developing_)
-```json
-file: package.json
-
-"dependencies": {
-    "devsquad-debugmate": "file:<place-here-you-clone-the-repo>"
-}
-```
-
-### 2. Install dependencies
+### 1. Install DebugMate
 ```bash
-npm install
+npm i @debugmate/reactjs
 ```
 
-### 3. Create `.env` file in the root project if you don't have one and add the following variables
+### 2. Create `.env` file in the root project if you don't have one and add the following variables
 ```.env
 // file: .env
 
