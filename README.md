@@ -73,7 +73,12 @@ ReactDOM.render(
 ```
 
 ### Usage With NextJS
-In Next.js, ensure "use client" is included at the top of the file where DebugmateProvider is used:
+
+To ensure that global errors are properly captured and reported using Debugmate in a Next.js application, it's crucial to set up the ErrorBoundary component. This component will catch errors in the app's lifecycle and send them to Debugmate for detailed error tracking.
+
+Here’s an updated example that combines both the DebugmateProvider and the ErrorBoundary to ensure global error handling is enabled in your Next.js application:
+
+1. To integrate DebugmateProvider, ensure you're using "use client" at the top of your file where the provider is being set up. This will ensure the provider is only rendered on the client side.
 
 ```js
 "use client";
@@ -104,6 +109,91 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+```
+
+2. Implementing ErrorBoundary for Global Error Handling
+It’s essential to use an ErrorBoundary to capture and report errors that occur within the React component tree. In this setup, when an error occurs, it is caught and reported to Debugmate for further analysis.
+
+Here is how you can set up the ErrorBoundary:
+
+```js
+'use client'
+
+import Debugmate from 'devsquad-debugmate';
+import React, { Component } from 'react';
+
+class ErrorBoundary extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+
+        this.debugmate = new Debugmate({
+            domain="https://your-domain.com"
+            token="your-api-token" 
+            enabled: true, 
+        });
+
+        this.debugmate.setupGlobalErrorHandling();
+    }
+
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error: error };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        this.setState({ errorInfo });
+        console.error("Error info:", errorInfo);
+
+        this.debugmate.publish(error);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return <h1>Something went wrong: {this.state.error?.message}</h1>;
+        }
+
+        return this.props.children; 
+    }
+}
+
+export default ErrorBoundary;
+
+```
+
+3. Wrapping Your App with ErrorBoundary
+Once you’ve set up the ErrorBoundary, make sure to wrap your entire application with it in the layout or _app.js file. This will ensure that all errors across the React component tree are caught by the ErrorBoundary.
+
+```js
+
+"use client";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <DebugmateProvider
+          domain="https://your-domain.com"
+          token="your-api-token"
+          enabled={true}
+          user={{
+            id: 1,
+            name: "John Doe",
+            email: "john.doe@example.com",
+          }}
+          environment={{
+            environment: "production",
+            debug: false,
+          }}
+        >
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+        </DebugmateProvider>
+      </body>
+    </html>
+  );
+}
+
 ```
 
 ### Set User Context
