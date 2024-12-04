@@ -7,17 +7,19 @@ describe('Debugmate', () => {
   let debugmate;
 
   beforeEach(() => {
-    process.env.REACT_APP_DEBUGMATE_DOMAIN = 'https://test.debugmate.com';
-    process.env.REACT_APP_DEBUGMATE_TOKEN = 'test-token';
-    process.env.REACT_APP_DEBUGMATE_ENABLED = 'true';
+    Debugmate.instance = null;
 
-    debugmate = new Debugmate();
+    debugmate = new Debugmate({
+      domain: 'https://test.debugmate.com',
+      token: 'test-token',
+      enabled: true,
+    });
   });
 
   test('constructor initializes with correct values', () => {
     expect(debugmate.domain).toBe('https://test.debugmate.com');
     expect(debugmate.token).toBe('test-token');
-    expect(debugmate.enabled).toBe('true');
+    expect(debugmate.enabled).toBe(true);
     expect(debugmate.context).toBeInstanceOf(Context);
   });
 

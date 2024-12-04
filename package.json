@@ -1,24 +1,46 @@
 {
-  "name": "debugmate",
+  "name": "debugmate-reactjs",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "DebugMate: An error tracking library for React & Next applications",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "babel src --out-dir dist --presets @babel/preset-env,@babel/preset-react",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "error-tracking",
+    "debugmate",
+    "react",
+    "monitoring",
+    "error-handling",
+    "debugging",
+    "next"
+  ],
+  "author": {
+    "name": "DevSquad",
+    "url": "https://devsquad.com/"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DebugMate/reactjs"
+  },
+  "homepage": "https://github.com/DebugMate/reactjs#readme",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.25.6",
-    "@babel/core": "^7.25.2",
-    "@babel/preset-env": "^7.25.4",
-    "@babel/preset-react": "^7.24.7",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9",
+    "babel-loader": "^9.2.1",
+    "babel-plugin-transform-imports": "^2.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "whatwg-fetch": "^3.6.20"
-  },
-  "dependencies": {
-    "stacktrace-js": "^2.0.2"
   }
 }

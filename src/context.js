@@ -25,14 +25,11 @@
 
 class Context {
     constructor() {
-        this.error = null;
-        this.request = null;
-        this.user = null;
-        this.environment = null;
         this.process = {
             platform: typeof window !== 'undefined' && navigator.platform ? navigator.platform : 'unknown',
             version: typeof window !== 'undefined' && navigator.appVersion ? navigator.appVersion : 'unknown',
         };
+        this.operatingSystem = this.checkOperationSystem();
     }
 
     /**
@@ -42,7 +39,6 @@ class Context {
      */
     setError(error) {
         this.error = error;
-        return this;
     }
 
     /**
@@ -52,7 +48,6 @@ class Context {
      */
     setRequest(request) {
         this.request = request;
-        return this;
     }
 
     /**
@@ -62,7 +57,6 @@ class Context {
      */
     setUser(user) {
         this.user = user;
-        return this;
     }
 
     /**
@@ -72,7 +66,6 @@ class Context {
      */
     setEnvironment(environment) {
         this.environment = environment;
-        return this;
     }
 
     /**
@@ -82,7 +75,6 @@ class Context {
      */
     setProcess(process) {
         this.process = process;
-        return this;
     }
 
     /**
@@ -172,40 +164,46 @@ class Context {
      * @returns {Object} Environment information grouped into JavaScript, App, and System contexts.
      */
     appEnvironment() {
-        const javascriptContext = {
-            group: 'JavaScript',
-            variables: {
-                version: this.getProcess.version || 'unknown',
-            }
-        };
-
-        const environmentVariables = {
-            environment: this.environment?.environment || 'unknown',
-            debug: this.environment?.debug || 'unknown',
-            timezone: this.environment?.timezone || 'unknown',
-        };
-
-        const environmentContext = {
-            group: 'App',
-            variables: environmentVariables,
-        };
-
-        const systemVariables = {
-            os: this.checkOperationSystem(),
-            server: this.environment?.server || 'unknown',
-            database: this.environment?.database || 'unknown',
-            npm: this.environment?.npm || 'unknown',
-            browser: navigator.userAgent || 'unknown',
-        };
-
-        const systemContext = {
-            group: 'System',
-            variables: systemVariables,
-        };
-
         return {
-            environment: this.filterKeys([javascriptContext, environmentContext, systemContext])
+            environment: this.filterKeys([
+                this.javascriptContext(),
+                this.appEnvironmentVariables(),
+                this.systemContext(),
+            ]),
         };
+    }
+
+    javascriptContext() {
+        return this.processInfo?.version
+            ? { group: 'JavaScript', variables: { version: this.getProcess.version || 'unknown' } }
+            : {};
+    }
+
+    appEnvironmentVariables() {
+        const vars = {};
+        this.addIfDefined(vars, 'environment', this.environment?.environment);
+        this.addIfDefined(vars, 'debug', this.environment?.debug);
+        this.addIfDefined(vars, 'timezone', this.environment?.timezone);
+
+        return Object.keys(vars).length ? { group: 'App', variables: vars } : {};
+    }
+
+    systemContext() {
+        const vars = {
+            os: this.operatingSystem,
+            server: this.environment?.server,
+            database: this.environment?.database,
+            npm: this.environment?.npm,
+            browser: this.request?.headers?.['user-agent'],
+        };
+
+        return { group: 'System', variables: vars };
+    }
+
+    addIfDefined(target, key, value) {
+        if (value !== undefined) {
+            target[key] = value;
+        }
     }
 
     /**
@@ -218,4 +216,4 @@ class Context {
     }
 }
 
-module.exports = { Context };
+module.exports.Context = Context;
