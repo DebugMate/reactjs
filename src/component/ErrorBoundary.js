@@ -62,7 +62,6 @@ class ErrorBoundary extends Component {
         this.setState({ errorInfo });
         console.error("Error info:", errorInfo);
 
-        // Report the error to Debugmate
         this.debugmate.publish(error);
     }
 

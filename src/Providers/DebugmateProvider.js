@@ -34,7 +34,6 @@ export const useDebugmateContext = () => useContext(DebugmateContext);
  * @returns {JSX.Element} - The rendered provider and its children, wrapped in an ErrorBoundary.
  */
 export const DebugmateProvider = ({ children, domain, token, enabled }) => {
-  // Initialize Debugmate state
   const debugmate = useDebugmateState({ domain, token, enabled });
 
   return (
