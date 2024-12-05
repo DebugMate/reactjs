@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+'use client'
+
+import { useEffect, useMemo } from 'react';
 import Debugmate from '../debugmate';
 
 /**
