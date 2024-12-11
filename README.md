@@ -64,6 +64,7 @@ ReactDOM.render(
 ```
 
 ### Usage With NextJS
+
 In Next.js, ensure "use client" is included at the top of the file where DebugmateProvider is used:
 
 ```js
