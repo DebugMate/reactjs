@@ -1,5 +1,4 @@
-test/
-tests/
-*.spec.js
-*.test.js
-jest.config.js
+/node_modules
+/src
+/test
+*.config.js

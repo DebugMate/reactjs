@@ -29,12 +29,19 @@ const { Context } = require('./context');
 
 
 class Debugmate {
-    constructor() {
-        this.domain = process.env.REACT_APP_DEBUGMATE_DOMAIN || process.env.NEXT_PUBLIC_DEBUGMATE_DOMAIN;
-        this.token = process.env.REACT_APP_DEBUGMATE_TOKEN || process.env.NEXT_PUBLIC_DEBUGMATE_TOKEN;
-        this.enabled = process.env.REACT_APP_DEBUGMATE_ENABLED || process.env.NEXT_PUBLIC_DEBUGMATE_ENABLED;
+    static instance = null;
 
-        this.context = new Context();
+    constructor(options = {}) {
+        if (!Debugmate.instance) {
+            this.domain = options.domain;
+            this.token = options.token;
+            this.enabled = options.enabled !== undefined ? options.enabled : true;
+            this.context = new Context();
+
+            Debugmate.instance = this;
+        }
+
+        return Debugmate.instance;
     }
 
     /**
@@ -71,7 +78,7 @@ class Debugmate {
      * @param {Environment|null} environmentContext
      * @returns {void}
      */
-    publish(error, userContext = null, environmentContext = null) {
+    publish(error, userContext = null, environmentContext = null, request = null) {
         if (!this.isPublishingAllowed(error)) return;
 
         if (userContext) {
@@ -80,6 +87,10 @@ class Debugmate {
 
         if (environmentContext) {
             this.setEnvironment(environmentContext);
+        }
+
+        if (request) {
+            this.setRequest(request);
         }
 
         const requestPayload = this.context.appRequest();
@@ -105,7 +116,7 @@ class Debugmate {
      * @returns {boolean}
      */
     isPublishingAllowed(error) {
-        if (!error || this.enabled == 'false' || !this.domain || !this.token) {
+        if (!error || this.enabled == false || !this.domain || !this.token) {
             console.warn('Error not published to Debugmate. Check environment variables or the error.');
             return false;
         }
