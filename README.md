@@ -21,18 +21,9 @@ const newDebugmate = new Debugmate({
 
 ## Installation
 
-### 1. Add module as a local dependency(_while we're still developing_)
-```json
-file: package.json
-
-"dependencies": {
-    "devsquad-debugmate": "file:<place-here-you-clone-the-repo>"
-}
-```
-
-### 2. Install dependencies
+### 1. Install DebugMate
 ```bash
-npm install
+npm i @debugmate/reactjs
 ```
 
 ## Usage

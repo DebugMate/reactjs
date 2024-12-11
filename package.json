@@ -1,5 +1,5 @@
 {
-  "name": "debugmate-reactjs",
+  "name": "@debugmate/reactjs",
   "version": "1.0.0",
   "description": "DebugMate: An error tracking library for React & Next applications",
   "main": "dist/index.js",
