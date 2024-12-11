@@ -32,12 +32,14 @@ npm i @debugmate/reactjs
 Initialize DebugMate by wrapping your application with the DebugmateProvider. Provide your API domain, token, and any additional context like user and environment.
 
 ```js
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App";
-import { DebugmateProvider } from "debugmate";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import { DebugmateProvider } from '@debugmate/reactjs';
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
   <React.StrictMode>
     <DebugmateProvider
       domain="https://your-domain.com"
@@ -56,20 +58,20 @@ ReactDOM.render(
         database: "PostgreSQL",
       }}
     >
-      <App />
+    <App />
     </DebugmateProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
 ```
 
 ### Usage With NextJS
+
 In Next.js, ensure "use client" is included at the top of the file where DebugmateProvider is used:
 
 ```js
-"use client";
+"use client"
 
-import { DebugmateProvider } from "debugmate";
+import { DebugmateProvider } from '@debugmate/reactjs'
 
 export default function RootLayout({ children }) {
   return (
@@ -93,14 +95,14 @@ export default function RootLayout({ children }) {
         </DebugmateProvider>
       </body>
     </html>
-  );
+  )
 }
 ```
 
 ### Set User Context
 User details can be passed directly via the DebugmateProvider. For manual updates:
 ```js
-import { useDebugmateContext } from 'debugmate';
+import { useDebugmateContext } from '@debugmate/reactjs';
 
 const debugmate = useDebugmateContext();
 
@@ -114,7 +116,7 @@ debugmate.setUser({
 ### Set Environment Context
 Add Environment metadata, such as app version or server info:
 ```js
-import { useDebugmateContext } from 'debugmate';
+import { useDebugmateContext } from '@debugmate/reactjs';
 
 const debugmate = useDebugmateContext();
 
@@ -129,7 +131,7 @@ debugmate.setEnvironment({
 ### Set Request Context
 Request details such as HTTP method, headers, query strings, and body can be set using the setRequest method. This helps in tracking requests tied to specific errors.
 ```js
-import { useDebugmateContext } from "debugmate";
+import { useDebugmateContext } from '@debugmate/reactjs';
 
 const debugmate = useDebugmateContext();
 
@@ -152,7 +154,7 @@ debugmate.setRequest({
 You can publish errors manually using the publish method. Pass optional `user`, `environment` and `request` contexts for better insights:
 
 ```js
-import { useDebugmateContext } from 'debugmate';
+import { useDebugmateContext } from '@debugmate/reactjs';
 
 const debugmate = useDebugmateContext();
 
