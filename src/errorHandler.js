@@ -21,7 +21,7 @@ const setupGlobalErrorHandlers = (debugmate) => {
         }
 
         debugmate.publish(error);
-        console.error('Global error captured:', { message, source, lineNumber, colNumber, error });
+        console.warn('Global error captured:', { message, source, lineNumber, colNumber, error });
     };
 
     /**
