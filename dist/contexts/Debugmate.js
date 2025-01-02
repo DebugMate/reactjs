@@ -1,8 +1,13 @@
-'use client'
+"use strict";
+'use client';
 
-import { useEffect, useMemo } from 'react';
-import Debugmate from '../debugmate';
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.useDebugmateState = void 0;
+var _react = require("react");
+var _debugmate = _interopRequireDefault(require("../debugmate"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
 /**
  * Hook to manage and initialize the Debugmate instance with provided configuration.
  *
@@ -14,28 +19,30 @@ import Debugmate from '../debugmate';
  *
  * @returns {Object} The initialized Debugmate instance.
  */
-export const useDebugmateState = ({ domain, token, enabled, user, environment }) => {
-  const debugmate = useMemo(() => new Debugmate({
-    domain,
-    token,
-    enabled,
-  }), [domain, token, enabled]);
-
-  useEffect(() => {
+var useDebugmateState = exports.useDebugmateState = function useDebugmateState(_ref) {
+  var domain = _ref.domain,
+    token = _ref.token,
+    enabled = _ref.enabled,
+    user = _ref.user,
+    environment = _ref.environment;
+  var debugmate = (0, _react.useMemo)(function () {
+    return new _debugmate["default"]({
+      domain: domain,
+      token: token,
+      enabled: enabled
+    });
+  }, [domain, token, enabled]);
+  (0, _react.useEffect)(function () {
     debugmate.setupGlobalErrorHandling();
-
     if (user) {
       debugmate.setUser(user);
     }
-
     if (environment) {
       debugmate.setEnvironment(environment);
     }
-
-    return () => {
+    return function () {
       debugmate.cleanupGlobalErrorHandling();
     };
   }, [debugmate]);
-
   return debugmate;
 };
