@@ -62,10 +62,19 @@ async function handleResponse(response) {
  */
 async function getCodePreviewFromAPI(domain, token, files) {
     try {
+        const formData = new FormData();
+
+        files.forEach((file, index) => {
+            formData.append(`files[${index}][path]`, file.path);
+            formData.append(`files[${index}][line]`, file.line);
+        });
+            
         const response = await fetch(`${domain}/api/preview-file`, {
-            method: 'POST',
-            headers: DEFAULT_HEADERS(token),
-            body: JSON.stringify({ files }),
+            method: "POST",
+            headers: {
+                'X-DEBUGMATE-TOKEN': token
+            },
+            body: formData,
         });
 
         if (!response.ok) {
@@ -80,5 +89,5 @@ async function getCodePreviewFromAPI(domain, token, files) {
         return {};
     }
 }
-
+    
 module.exports = { sendErrorToAPI, handleResponse, getCodePreviewFromAPI };
