@@ -61,33 +61,44 @@ async function handleResponse(response) {
  * @returns {Promise<Object>} An object with the previews of the requested files.
  */
 async function getCodePreviewFromAPI(domain, token, files) {
-    try {
-        const formData = new FormData();
+    const createPayload = (files) => ({
+        files: files.map(file => {
+            const fileName = file.path.split('/').slice(-2).join('/');
+            return {
+                error_file_name: fileName,
+                error_line_number: file.line
+            };
+        })
+    });
 
-        files.forEach((file, index) => {
-            formData.append(`files[${index}][path]`, file.path);
-            formData.append(`files[${index}][line]`, file.line);
-        });
-            
-        const response = await fetch(`${domain}/api/preview-file`, {
+    const fetchPreviews = async (domain, token, payload) => {
+        const response = await fetch(`${domain}/api/preview-files`, {
             method: "POST",
-            headers: {
-                'X-DEBUGMATE-TOKEN': token
-            },
-            body: formData,
+            headers: DEFAULT_HEADERS(token),
+            body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-            console.error(`Error fetching preview: ${response.statusText}`);
-            return {};
+            console.error(`Error fetching previews: ${response.statusText}`);
+            if (response.status === 429) {
+                console.warn('Too many requests, waiting before retrying...');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            return null;
         }
 
-        const data = await response.json();
-        return data.previews || {};
+        return response.json();
+    };
+
+    try {
+        const payload = createPayload(files);
+        const data = await fetchPreviews(domain, token, payload);
+
+        return data?.previews || {};
     } catch (err) {
         console.error('Error while fetching preview from API:', err);
         return {};
     }
 }
-    
+
 module.exports = { sendErrorToAPI, handleResponse, getCodePreviewFromAPI };
