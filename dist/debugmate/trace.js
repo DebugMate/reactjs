@@ -8,7 +8,6 @@ var _require = require('../stackTraceParser'),
   parse = _require.parse;
 var _require2 = require('./api'),
   getCodePreviewFromAPI = _require2.getCodePreviewFromAPI;
-
 /**
  * Parses the error stack trace and retrieves relevant information such as file, line, column, function name, and preview.
  * 
@@ -44,12 +43,15 @@ function _trace() {
         case 7:
           previews = _context.sent;
           return _context.abrupt("return", sources.map(function (_ref2) {
+            var _previews;
             var name = _ref2.name,
               message = _ref2.message,
               file = _ref2.file,
               line = _ref2.line,
               column = _ref2.column,
               func = _ref2["function"];
+            var fileName = getPathAfterSrc(file);
+            var previewKey = (_previews = previews[file + ':' + line]) !== null && _previews !== void 0 ? _previews : previews[fileName + ':' + line];
             return {
               name: name,
               message: message,
@@ -57,7 +59,7 @@ function _trace() {
               line: line,
               column: column || 0,
               "function": func || 'anonymous',
-              preview: previews[file + ':' + line] || ['Preview not available']
+              preview: previewKey !== null && previewKey !== void 0 ? previewKey : ['Preview not available']
             };
           }));
         case 11:
@@ -72,6 +74,13 @@ function _trace() {
     }, _callee, null, [[0, 11]]);
   }));
   return _trace.apply(this, arguments);
+}
+function getPathAfterSrc(path) {
+  var srcIndex = path.indexOf('/src/');
+  if (srcIndex !== -1) {
+    return path.slice(srcIndex + 5);
+  }
+  return path;
 }
 module.exports = {
   trace: trace

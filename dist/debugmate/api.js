@@ -122,7 +122,7 @@ function _getCodePreviewFromAPI() {
           createPayload = function createPayload(files) {
             return {
               files: files.map(function (file) {
-                var fileName = file.path.split('/').slice(-2).join('/');
+                var fileName = file.path.split('/').slice(-1).join('/');
                 return {
                   error_file_name: fileName,
                   error_line_number: file.line
@@ -161,8 +161,11 @@ function _getCodePreviewFromAPI() {
                   case 9:
                     return _context3.abrupt("return", null);
                   case 10:
-                    return _context3.abrupt("return", response.json());
-                  case 11:
+                    _context3.next = 12;
+                    return response.json();
+                  case 12:
+                    return _context3.abrupt("return", _context3.sent);
+                  case 13:
                   case "end":
                     return _context3.stop();
                 }

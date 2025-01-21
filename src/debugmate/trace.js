@@ -1,6 +1,5 @@
 const { parse } = require('../stackTraceParser');
 const { getCodePreviewFromAPI } = require('./api');
-
 /**
  * Parses the error stack trace and retrieves relevant information such as file, line, column, function name, and preview.
  * 
@@ -14,20 +13,35 @@ async function trace(error, domain, token) {
         const sources = await parse(error);
         const files = sources.map(({ file, line }) => ({ path: file, line }));
         const previews = await getCodePreviewFromAPI(domain, token, files);
+        
+        return sources.map(({ name, message, file, line, column, function: func }) => {
 
-        return sources.map(({ name, message, file, line, column, function: func }) => ({
-            name,
-            message,
-            file: file || 'unknown',
-            line,
-            column: column || 0,
-            function: func || 'anonymous',
-            preview: previews[file + ':' + line] || ['Preview not available'],
-        }));
+            const fileName = getPathAfterSrc(file);
+            const previewKey = previews[file + ':' + line] ?? previews[fileName + ':' + line];
+
+            return {
+                name,
+                message,
+                file: file || 'unknown',
+                line,
+                column: column || 0,
+                function: func || 'anonymous',
+                preview: previewKey ?? ['Preview not available']
+        }});
     } catch (err) {
         console.error('Error while parsing stack trace:', err);
         return [];
     }
+}
+
+function getPathAfterSrc(path) {
+    const srcIndex = path.indexOf('/src/');
+    
+    if (srcIndex !== -1) {
+        return path.slice(srcIndex + 5);
+    }
+    
+    return path;
 }
 
 module.exports = { trace };

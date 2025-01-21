@@ -63,7 +63,8 @@ async function handleResponse(response) {
 async function getCodePreviewFromAPI(domain, token, files) {
     const createPayload = (files) => ({
         files: files.map(file => {
-            const fileName = file.path.split('/').slice(-2).join('/');
+            const fileName = file.path.split('/').slice(-1).join('/');
+
             return {
                 error_file_name: fileName,
                 error_line_number: file.line
@@ -87,13 +88,13 @@ async function getCodePreviewFromAPI(domain, token, files) {
             return null;
         }
 
-        return response.json();
+        return await response.json();
     };
 
     try {
         const payload = createPayload(files);
         const data = await fetchPreviews(domain, token, payload);
-
+        
         return data?.previews || {};
     } catch (err) {
         console.error('Error while fetching preview from API:', err);
