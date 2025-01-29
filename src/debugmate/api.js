@@ -63,10 +63,8 @@ async function handleResponse(response) {
 async function getCodePreviewFromAPI(domain, token, files) {
     const createPayload = (files) => ({
         files: files.map(file => {
-            const fileName = file.path.split('/').slice(-1).join('/');
-
             return {
-                error_file_name: fileName,
+                error_file_name: file.path,
                 error_line_number: file.line
             };
         })

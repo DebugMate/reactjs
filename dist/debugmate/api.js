@@ -122,9 +122,8 @@ function _getCodePreviewFromAPI() {
           createPayload = function createPayload(files) {
             return {
               files: files.map(function (file) {
-                var fileName = file.path.split('/').slice(-1).join('/');
                 return {
-                  error_file_name: fileName,
+                  error_file_name: file.path,
                   error_line_number: file.line
                 };
               })
