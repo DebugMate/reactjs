@@ -21,7 +21,7 @@ var setupGlobalErrorHandlers = function setupGlobalErrorHandlers(debugmate) {
       error.columnNumber = colNumber;
     }
     debugmate.publish(error);
-    console.error('Global error captured:', {
+    console.warn('Global error captured:', {
       message: message,
       source: source,
       lineNumber: lineNumber,

@@ -47,11 +47,15 @@ var DebugmateProvider = exports.DebugmateProvider = function DebugmateProvider(_
   var children = _ref.children,
     domain = _ref.domain,
     token = _ref.token,
-    enabled = _ref.enabled;
+    enabled = _ref.enabled,
+    user = _ref.user,
+    environment = _ref.environment;
   var debugmate = (0, _Debugmate.useDebugmateState)({
     domain: domain,
     token: token,
-    enabled: enabled
+    enabled: enabled,
+    user: user,
+    environment: environment
   });
   return /*#__PURE__*/_react["default"].createElement(DebugmateContext.Provider, {
     value: debugmate

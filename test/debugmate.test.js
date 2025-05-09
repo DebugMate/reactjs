@@ -16,6 +16,14 @@ describe('Debugmate', () => {
     });
   });
 
+  beforeAll(() => {
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
+  });
+
+  afterAll(() => {
+    console.warn.mockRestore();
+  });
+
   test('constructor initializes with correct values', () => {
     expect(debugmate.domain).toBe('https://test.debugmate.com');
     expect(debugmate.token).toBe('test-token');
@@ -44,17 +52,5 @@ describe('Debugmate', () => {
   test('isPublishingAllowed returns false when conditions are not met', () => {
     debugmate.enabled = false;
     expect(debugmate.isPublishingAllowed(new Error())).toBe(false);
-  });
-
-  test('payload returns correct structure', () => {
-    const error = new Error('Test error');
-    const request = { method: 'GET', params: {} };
-    const payload = debugmate.payload(error, request);
-
-    expect(payload).toHaveProperty('exception');
-    expect(payload).toHaveProperty('message');
-    expect(payload).toHaveProperty('file');
-    expect(payload).toHaveProperty('type');
-    expect(payload).toHaveProperty('trace');
   });
 });

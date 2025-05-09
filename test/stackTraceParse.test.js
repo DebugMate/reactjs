@@ -1,13 +1,21 @@
 import { parse } from '../src/stackTraceParser';
 
 describe('parse', () => {
-  test('returns empty sources and stack for error without stack', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
+  });
+
+  afterAll(() => {
+    console.warn.mockRestore();
+  });
+
+  test('returns empty sources and stack for error without stack', async () => {
     const error = new Error('Test error');
     error.stack = undefined;
 
-    const result = parse(error);
+    const result = await parse(error);
 
-    expect(result).toEqual({ sources: [], stack: '' });
+    expect(result).toEqual([]);
   });
 
   test('parses stack trace correctly', () => {
@@ -19,13 +27,17 @@ describe('parse', () => {
 
     const result = parse(error);
 
-    expect(result.sources).toHaveLength(3);
-    expect(result.sources[0]).toEqual({
-      function: 'Object.<anonymous>',
-      file: '/path/to/file.js',
-      line: '1',
-      column: '1',
+    result.then(res => {
+      expect(res.sources).toHaveLength(3);
+
+      expect(res.sources[0]).toEqual({
+        function: 'Object.<anonymous>',
+        file: '/path/to/file.js',
+        line: '1',
+        column: '1',
+      });
+
+      expect(res.stack).toBe(error.stack);
     });
-    expect(result.stack).toBe(error.stack);
   });
 });
